@@ -43,8 +43,11 @@ class KmoshiDepthConfig(PreTrainedConfig):
 
     model_type = "kmoshi_depth"
     keys_to_ignore_at_inference = ["past_key_values"]
-
-    vocab_size: int = 32000
+    # The depth decoder conditions on text tokens of the Qwen3 tokenizer, so its text
+    # embedding table must match the Qwen3 vocab. Must equal KmoshiConfig.vocab_size:
+    # a standalone KmoshiDepthConfig() would otherwise disagree with the one rebuilt
+    # from a saved KmoshiConfig (whose __post_init__ propagates the main vocab_size).
+    vocab_size: int = 151936
     hidden_size: int = 1024
     input_size: int = 4096
     num_hidden_layers: int = 6

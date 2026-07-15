@@ -25,7 +25,11 @@ class KmoshiRMSNorm(PersonaplexRMSNorm):
 
 
 class KmoshiDepthConfig(PersonaplexDepthConfig):
-    pass
+    # The depth decoder conditions on text tokens of the Qwen3 tokenizer, so its text
+    # embedding table must match the Qwen3 vocab. Must equal KmoshiConfig.vocab_size:
+    # a standalone KmoshiDepthConfig() would otherwise disagree with the one rebuilt
+    # from a saved KmoshiConfig (whose __post_init__ propagates the main vocab_size).
+    vocab_size: int = 151936
 
 
 class KmoshiConfig(PersonaplexConfig):
