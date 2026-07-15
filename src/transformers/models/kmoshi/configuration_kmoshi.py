@@ -124,22 +124,22 @@ class KmoshiConfig(PreTrainedConfig):
     keys_to_ignore_at_inference = ["past_key_values"]
     sub_configs = {"audio_encoder_config": AutoConfig, "depth_decoder_config": KmoshiDepthConfig}
 
-    vocab_size: int = 32000
+    vocab_size: int = 151936
     hidden_size: int = 4096
-    num_hidden_layers: int = 32
+    num_hidden_layers: int = 36
     num_attention_heads: int = 32
-    num_key_value_heads: int | None = None
+    num_key_value_heads: int | None = 8
     audio_vocab_size: int | None = None
     max_position_embeddings: int = 3000
     rope_parameters: RopeParameters | dict | None = None
     hidden_act: str = "silu"
-    head_dim: int | None = None
+    head_dim: int | None = 128
     initializer_range: float = 0.02
     use_cache: bool = True
     sliding_window: int = 3000
     attention_dropout: float | int = 0.0
-    ffn_dim: int = 22528
-    rms_norm_eps: float = 1e-8
+    ffn_dim: int = 24576
+    rms_norm_eps: float = 1e-6
     num_codebooks: int = 8
     tie_word_embeddings: bool = False
     pad_token_id: int | None = None
@@ -147,6 +147,11 @@ class KmoshiConfig(PreTrainedConfig):
     eos_token_id: int | list[int] | None = None
     audio_encoder_config: dict | PreTrainedConfig | None = None
     depth_decoder_config: dict | PreTrainedConfig | None = None
+    # Kmoshi swaps the Helium temporal backbone for Qwen3-8B (Korean-capable text LLM).
+    # `hidden_size` stays 4096 on purpose: the 16 audio input embeddings and the depth
+    # decoder's `input_projections` keep their PersonaPlex shapes (and weights) across
+    # the swap. `ffn_dim` is the fused-GLU width: 2 * Qwen3-8B intermediate_size (12288).
+    default_theta = 1000000.0
 
     def __post_init__(self, **kwargs):
         self.num_key_value_heads = (
